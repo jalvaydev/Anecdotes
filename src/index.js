@@ -14,6 +14,16 @@ const Statistic = ({text, value}) => {
   )
 }
 
+const AnecdoteStatistic = ({text, value}) => {
+  return (
+    <table>
+      <tbody>
+        <Statistic text={text} value={value}/>
+      </tbody>
+    </table>
+  )
+}
+
 
 const Statistics = ({good, bad, neutral}) => {
   
@@ -52,11 +62,12 @@ const Anecdote = ({text}) => {
 }
 
 const App = (props) => {
-  // save clicks of each button to own state
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
   const [selected, setSelected] = useState(0)
+  const [points, setPoints] = useState(new Array(10 + 1).join('0').split('').map(parseFloat))
+  const [topAnecdote, setTopAnecdote] = useState(0)
 
   const handleClick = (val) => () => {
     if (val === 0){
@@ -70,21 +81,52 @@ const App = (props) => {
     }
   }
 
+  const handleVote = () => () => {
+    let copy = [...points]
+    copy[selected] += 1
+    setPoints(copy)
+    selectTopAnecdote(copy)
+  }
+
   const giveAnecdote = () => () => {
     let rand = Math.floor((Math.random() * (props.anecdotes.length)));
 
     return setSelected(rand);
   }
 
+  const selectTopAnecdote = (copy) => {
+    let idx = 0
+    let max = 0
+    for(let i = 0; i < copy.length; i++) {
+      if (max < copy[i]){
+        max = copy[i]
+        idx = i
+      }
+    }
+    
+    setTopAnecdote(idx)
+  }
+
   return (
     <div>
-      <Header text ="anecdotes"/>
+      {/* Anecdotes */}
+      <Header text ="Anecdote of the day"/>
       <Anecdote text={props.anecdotes[selected]}/>
+      <AnecdoteStatistic text="current votes" value={points[selected]}/>
       <Button onclick={giveAnecdote()} text="click for next anecdote"/>
+      <Button onclick={handleVote()} text="vote"/>
+
+      <Header text="Anecdote with most votes"/>
+      <Anecdote text={props.anecdotes[topAnecdote]}/>
+      <p>Has {points[topAnecdote]} votes</p>
+
+      {/* Feedback */}
       <Header text="give feedback"/>
       <Button onclick={handleClick(0)} text="good"/>
       <Button onclick={handleClick(1)} text="neutral"/>
-      <Button onclick={handleClick(2)} text="bad"/>      
+      <Button onclick={handleClick(2)} text="bad"/> 
+
+      {/* Statistics */}
       <Header text="statistics"/>
       <Statistics good={good} bad={bad} neutral={neutral}/>
     </div>
