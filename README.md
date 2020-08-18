@@ -7,4 +7,6 @@ In this project, I created an app which will display a anecdote and the votes wh
 ## To Do
 
 [] Update the CSS formatting of the app
+
+
 [] Add an API which will generate more anecdotes
